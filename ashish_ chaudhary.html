@@ -1,0 +1,2259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>The Python Almanac — Vol. 01 · An Introduction</title>
+<meta name="description" content="A beautifully crafted introduction to Python. Live in-browser compiler, exercises, and a homework game." />
+
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..900,0..100;1,9..144,300..900,0..100&family=Newsreader:ital,opsz,wght@0,6..72,200..800;1,6..72,200..800&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&display=swap" rel="stylesheet" />
+
+<!-- CodeMirror (for syntax-highlighted live editors) -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+
+<style>
+/* ================================================================
+   THE PYTHON ALMANAC — Stylesheet
+   A warm, editorial, magazine-inspired interface.
+   ================================================================ */
+
+:root {
+  --cream:        #efe6d2;
+  --cream-soft:   #f5ecd9;
+  --cream-deep:   #e3d8bd;
+  --ink:          #1a1410;
+  --ink-soft:     #3a322a;
+  --ink-faded:    #6b5d4f;
+  --vermilion:    #c83e1e;
+  --vermilion-d:  #a82e10;
+  --ochre:        #d4a627;
+  --moss:         #4a5d3f;
+  --moss-d:       #364628;
+  --code-bg:      #1a1410;
+  --code-fg:      #efe6d2;
+  --code-comment: #8a7a5f;
+  --code-key:     #e89c4a;
+  --code-str:     #b8c97a;
+  --code-num:     #d4a627;
+  --code-fn:      #6fb1c9;
+  --rule:         #4a3f30;
+
+  --font-display: 'Fraunces', 'Times New Roman', serif;
+  --font-body:    'Newsreader', Georgia, serif;
+  --font-mono:    'JetBrains Mono', 'Courier New', monospace;
+
+  --max-w: 1280px;
+  --read-w: 720px;
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+
+body {
+  margin: 0;
+  background: var(--cream);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 19px;
+  line-height: 1.55;
+  font-feature-settings: "ss01", "ss02", "liga", "calt";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* Subtle grain overlay for warmth */
+body::before {
+  content: "";
+  position: fixed; inset: 0;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: .35;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='240' height='240'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.1 0 0 0 0 0.08 0 0 0 0 0.06 0 0 0 0.18 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+}
+
+::selection { background: var(--vermilion); color: var(--cream); }
+
+/* ----- TYPOGRAPHY ----- */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1.05;
+  margin: 0;
+}
+h1 { font-size: clamp(3rem, 9vw, 8rem); font-weight: 700; }
+h2 { font-size: clamp(2rem, 5vw, 3.5rem); }
+h3 { font-size: clamp(1.4rem, 2.5vw, 1.9rem); letter-spacing: -0.015em; }
+h4 { font-size: 1.15rem; letter-spacing: 0.02em; text-transform: uppercase; font-weight: 600; }
+
+.serif-italic { font-family: var(--font-display); font-style: italic; font-weight: 400; }
+.eyebrow {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  display: inline-flex; align-items: center; gap: 12px;
+}
+.eyebrow::before {
+  content: ""; width: 28px; height: 1px; background: var(--ink-faded);
+}
+
+p { margin: 0 0 1.1em; }
+p.lede {
+  font-family: var(--font-display);
+  font-size: clamp(1.35rem, 2.2vw, 1.75rem);
+  font-weight: 300;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  color: var(--ink-soft);
+  margin-bottom: 1.6em;
+}
+p.lede em { color: var(--vermilion); font-style: italic; }
+
+.dropcap::first-letter {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 5em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.08em 0.12em 0 0;
+  color: var(--vermilion);
+}
+
+a { color: var(--vermilion); text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+a:hover { color: var(--vermilion-d); }
+
+code, kbd {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--cream-deep);
+  padding: 0.1em 0.4em;
+  border-radius: 3px;
+  color: var(--ink);
+}
+kbd {
+  border: 1px solid var(--ink-faded);
+  background: var(--cream-soft);
+  font-size: 0.78em;
+  padding: 0.15em 0.45em;
+  box-shadow: 0 2px 0 var(--ink-faded);
+}
+
+hr.rule {
+  border: 0;
+  height: 1px;
+  background: var(--ink);
+  margin: 0;
+}
+hr.rule-thick {
+  border: 0;
+  height: 4px;
+  background: var(--ink);
+  margin: 0;
+}
+.ornament {
+  text-align: center;
+  font-family: var(--font-display);
+  color: var(--vermilion);
+  letter-spacing: 1.5em;
+  padding: 2rem 0 2rem 1.5em;
+  font-size: 0.9rem;
+}
+
+/* ----- LAYOUT ----- */
+.wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 clamp(20px, 4vw, 56px); }
+.read { max-width: var(--read-w); }
+
+/* ============================================================
+   NAVIGATION
+   ============================================================ */
+nav.masthead-nav {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(239, 230, 210, 0.92);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--ink);
+}
+nav.masthead-nav .wrap {
+  display: flex; align-items: center; justify-content: space-between;
+  padding-top: 14px; padding-bottom: 14px;
+  gap: 24px;
+}
+.brand {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  letter-spacing: -0.01em;
+  display: flex; align-items: center; gap: 10px;
+}
+.brand .dot { color: var(--vermilion); font-size: 1.6em; line-height: 0; }
+.nav-links {
+  display: flex; gap: clamp(14px, 2vw, 28px);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.nav-links a {
+  color: var(--ink);
+  text-decoration: none;
+  position: relative;
+  padding: 4px 0;
+}
+.nav-links a:hover { color: var(--vermilion); }
+.nav-links a::after {
+  content: ""; position: absolute; left: 0; bottom: 0;
+  width: 0; height: 1px; background: var(--vermilion);
+  transition: width 0.3s ease;
+}
+.nav-links a:hover::after { width: 100%; }
+
+.compiler-status {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  display: flex; align-items: center; gap: 8px;
+  color: var(--ink-faded);
+}
+.compiler-status .pulse {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--ochre);
+  animation: pulse 1.6s ease-in-out infinite;
+}
+.compiler-status.ready .pulse { background: var(--moss); animation: none; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.7); }
+}
+
+@media (max-width: 760px) {
+  .nav-links { display: none; }
+}
+
+/* ============================================================
+   HERO / MASTHEAD
+   ============================================================ */
+header.hero {
+  border-bottom: 4px solid var(--ink);
+  padding: clamp(40px, 7vw, 80px) 0 clamp(40px, 6vw, 70px);
+  position: relative;
+}
+.hero-meta {
+  display: flex; justify-content: space-between; align-items: flex-end;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--ink);
+  margin-bottom: clamp(28px, 5vw, 56px);
+  gap: 18px; flex-wrap: wrap;
+}
+.hero-meta span { display: flex; align-items: center; gap: 8px; }
+.hero-meta span::before {
+  content: "✦"; color: var(--vermilion); font-size: 0.7em;
+}
+.hero-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: clamp(30px, 5vw, 70px);
+  align-items: end;
+}
+@media (max-width: 900px) {
+  .hero-grid { grid-template-columns: 1fr; }
+}
+.hero-title h1 {
+  font-style: italic;
+  font-variation-settings: "SOFT" 50, "opsz" 144;
+}
+.hero-title h1 .amp {
+  font-style: italic;
+  color: var(--vermilion);
+  font-weight: 300;
+  display: inline-block;
+  transform: translateY(-0.05em);
+}
+.hero-sub {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-top: 1.2rem;
+  max-width: 540px;
+  font-weight: 300;
+  line-height: 1.4;
+}
+.hero-side {
+  border-left: 1px solid var(--ink);
+  padding-left: clamp(20px, 3vw, 40px);
+}
+@media (max-width: 900px) {
+  .hero-side { border-left: 0; padding-left: 0; border-top: 1px solid var(--ink); padding-top: 30px; }
+}
+.hero-side .label {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-bottom: 8px;
+}
+.hero-side p { font-size: 1rem; color: var(--ink-soft); margin-bottom: 1em; }
+
+/* Decorative snake SVG */
+.snake-deco {
+  position: absolute;
+  right: -40px;
+  top: 120px;
+  width: 280px;
+  opacity: 0.12;
+  pointer-events: none;
+  transform: rotate(15deg);
+}
+@media (max-width: 1100px) { .snake-deco { display: none; } }
+
+/* CTA / scroll prompt */
+.scroll-hint {
+  display: inline-flex; align-items: center; gap: 14px;
+  margin-top: 36px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border-bottom: 1px solid var(--ink);
+  padding-bottom: 4px;
+}
+.scroll-hint .arrow {
+  display: inline-block;
+  transition: transform .3s ease;
+}
+.scroll-hint:hover .arrow { transform: translateY(4px); }
+
+/* ============================================================
+   TOC / IN THIS ISSUE
+   ============================================================ */
+section.toc {
+  padding: clamp(50px, 7vw, 90px) 0;
+  border-bottom: 1px solid var(--ink);
+}
+.toc-grid {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: clamp(20px, 4vw, 60px);
+}
+@media (max-width: 760px) {
+  .toc-grid { grid-template-columns: 1fr; }
+}
+.toc-label h2 {
+  font-style: italic;
+  font-weight: 300;
+  color: var(--vermilion);
+}
+.toc-list {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+@media (max-width: 700px) { .toc-list { grid-template-columns: 1fr; } }
+.toc-item {
+  display: flex; align-items: baseline; gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--ink);
+  text-decoration: none;
+  color: var(--ink);
+  transition: padding-left 0.35s ease, color 0.35s ease;
+}
+.toc-item:nth-child(odd) { border-right: 1px solid var(--ink); padding-right: 24px; }
+@media (min-width: 701px) {
+  .toc-item:nth-child(odd) { padding-right: 24px; }
+  .toc-item:nth-child(even) { padding-left: 24px; }
+}
+@media (max-width: 700px) {
+  .toc-item:nth-child(odd) { border-right: 0; padding-right: 0; }
+}
+.toc-item:last-child, .toc-item:nth-last-child(2):nth-child(odd) { border-bottom: 1px solid var(--ink); }
+.toc-item:hover { padding-left: 12px; color: var(--vermilion); }
+.toc-num {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--ink-faded);
+  letter-spacing: 0.05em;
+}
+.toc-item:hover .toc-num { color: var(--vermilion); }
+.toc-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 500;
+  flex: 1;
+}
+.toc-title em { color: var(--ink-faded); font-weight: 400; font-size: 0.85em; display: block; margin-top: 2px; }
+
+/* ============================================================
+   CHAPTER LAYOUT
+   ============================================================ */
+section.chapter {
+  padding: clamp(60px, 9vw, 120px) 0;
+  border-bottom: 1px solid var(--ink);
+  position: relative;
+}
+section.chapter:nth-of-type(even) { background: var(--cream-soft); }
+
+.chapter-head {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: clamp(20px, 4vw, 60px);
+  margin-bottom: clamp(30px, 4vw, 56px);
+  align-items: start;
+}
+@media (max-width: 760px) {
+  .chapter-head { grid-template-columns: 1fr; gap: 20px; }
+}
+.chapter-num {
+  font-family: var(--font-display);
+  font-size: clamp(3.5rem, 8vw, 6rem);
+  font-weight: 200;
+  font-style: italic;
+  color: var(--vermilion);
+  line-height: 0.9;
+  font-variation-settings: "SOFT" 100;
+}
+.chapter-num small {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  font-style: normal;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-top: 8px;
+}
+.chapter-title-wrap h2 { margin-bottom: 0.6em; }
+.chapter-title-wrap .lede { max-width: 640px; }
+
+.chapter-body { display: grid; grid-template-columns: 1fr; gap: 30px; }
+
+.col-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3vw, 40px);
+}
+@media (max-width: 780px) { .col-2 { grid-template-columns: 1fr; } }
+
+.col-text { max-width: var(--read-w); }
+
+/* Sidebar callouts */
+.callout {
+  border-left: 3px solid var(--vermilion);
+  padding: 4px 0 4px 20px;
+  font-style: italic;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: 1.15rem;
+  color: var(--ink-soft);
+  margin: 1.6em 0;
+}
+.box {
+  background: var(--cream-deep);
+  border: 1px solid var(--ink);
+  padding: clamp(20px, 3vw, 30px);
+  margin: 1.6em 0;
+}
+.box h4 { color: var(--vermilion); margin-bottom: 14px; }
+.box ul { margin: 0; padding-left: 1.2em; }
+.box li { margin-bottom: 6px; }
+
+/* ============================================================
+   CODE BLOCKS
+   ============================================================ */
+.code-block {
+  background: var(--code-bg);
+  color: var(--code-fg);
+  font-family: var(--font-mono);
+  border: 1px solid var(--ink);
+  margin: 1.4em 0;
+  position: relative;
+  overflow: hidden;
+}
+.code-block .code-bar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 16px;
+  background: rgba(239, 230, 210, 0.06);
+  border-bottom: 1px solid rgba(239, 230, 210, 0.12);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+.code-block .code-bar .left { display: flex; align-items: center; gap: 10px; color: var(--code-comment); }
+.code-block .code-bar .dots { display: inline-flex; gap: 5px; }
+.code-block .code-bar .dots span { width: 9px; height: 9px; border-radius: 50%; background: #5b4f3c; }
+.code-block .code-bar .dots span:nth-child(1) { background: var(--vermilion); }
+.code-block .code-bar .dots span:nth-child(2) { background: var(--ochre); }
+.code-block .code-bar .dots span:nth-child(3) { background: var(--moss); }
+.code-block .code-bar .right { color: var(--code-comment); font-family: var(--font-mono); }
+
+pre.static-code {
+  margin: 0;
+  padding: 18px 22px;
+  font-size: 0.92rem;
+  line-height: 1.55;
+  overflow-x: auto;
+  white-space: pre;
+}
+.tok-key { color: var(--code-key); font-weight: 500; }
+.tok-str { color: var(--code-str); }
+.tok-num { color: var(--code-num); }
+.tok-com { color: var(--code-comment); font-style: italic; }
+.tok-fn  { color: var(--code-fn); }
+.tok-op  { color: #d09a6a; }
+
+/* Live editor (CodeMirror) styling */
+.live-code .cm-wrap {
+  background: var(--code-bg);
+  font-family: var(--font-mono);
+}
+.CodeMirror {
+  background: transparent !important;
+  color: var(--code-fg) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 0.92rem;
+  line-height: 1.6;
+  padding: 14px 8px;
+  height: auto;
+  min-height: 100px;
+}
+.CodeMirror-gutters { background: transparent !important; border-right: 1px solid rgba(239,230,210,0.12) !important; }
+.CodeMirror-linenumber { color: var(--code-comment) !important; }
+.CodeMirror-cursor { border-left: 2px solid var(--ochre) !important; }
+.cm-s-default .cm-keyword    { color: var(--code-key) !important; font-weight: 500; }
+.cm-s-default .cm-string     { color: var(--code-str) !important; }
+.cm-s-default .cm-number     { color: var(--code-num) !important; }
+.cm-s-default .cm-comment    { color: var(--code-comment) !important; font-style: italic; }
+.cm-s-default .cm-def        { color: var(--code-fn) !important; }
+.cm-s-default .cm-variable   { color: var(--code-fg) !important; }
+.cm-s-default .cm-variable-2 { color: var(--code-fg) !important; }
+.cm-s-default .cm-builtin    { color: var(--code-fn) !important; }
+.cm-s-default .cm-operator   { color: #d09a6a !important; }
+.cm-s-default .cm-property   { color: #c9c7b8 !important; }
+.cm-s-default .cm-atom       { color: var(--code-num) !important; }
+.CodeMirror ::selection { background: rgba(200, 62, 30, 0.4) !important; }
+
+.live-code {
+  background: var(--code-bg);
+  border: 1px solid var(--ink);
+  margin: 1.6em 0;
+}
+.live-code .editor-area { padding: 4px 0; }
+.live-code-toolbar {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px;
+  background: rgba(239, 230, 210, 0.04);
+  border-top: 1px solid rgba(239, 230, 210, 0.12);
+  gap: 12px; flex-wrap: wrap;
+}
+.btn-run {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: var(--ochre);
+  color: var(--ink);
+  border: 0;
+  padding: 11px 22px;
+  cursor: pointer;
+  font-weight: 600;
+  display: inline-flex; align-items: center; gap: 10px;
+  transition: background 0.2s, transform 0.1s;
+}
+.btn-run:hover { background: #e8b934; }
+.btn-run:active { transform: translateY(1px); }
+.btn-run:disabled { opacity: 0.5; cursor: wait; }
+.btn-run .play {
+  width: 0; height: 0;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+  border-left: 9px solid var(--ink);
+}
+.btn-reset {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--code-comment);
+  border: 1px solid var(--code-comment);
+  padding: 10px 16px;
+  cursor: pointer;
+  transition: color .2s, border-color .2s;
+}
+.btn-reset:hover { color: var(--code-fg); border-color: var(--code-fg); }
+
+.output-pane {
+  border-top: 1px solid rgba(239, 230, 210, 0.12);
+  padding: 14px 22px 18px;
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--code-fg);
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 0;
+  background: rgba(0,0,0,0.18);
+}
+.output-pane:empty { display: none; }
+.output-label {
+  font-size: 0.66rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--code-comment);
+  margin-bottom: 8px;
+  display: block;
+}
+.output-error { color: #ff8a65; }
+.output-ok    { color: var(--code-str); }
+
+/* ============================================================
+   EXERCISES
+   ============================================================ */
+.exercise {
+  background: var(--cream-deep);
+  border: 1px solid var(--ink);
+  padding: clamp(24px, 3vw, 36px);
+  margin: 2em 0;
+  position: relative;
+}
+.exercise .ex-head {
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--ink);
+}
+.exercise .ex-tag {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  background: var(--vermilion);
+  color: var(--cream);
+  padding: 4px 10px;
+}
+.exercise h3 { font-size: 1.4rem; flex: 1; }
+.exercise p { margin-bottom: 1em; }
+.exercise .hint {
+  font-size: 0.92rem;
+  color: var(--ink-soft);
+  font-style: italic;
+  margin-top: 14px;
+}
+details.solution {
+  margin-top: 14px;
+  border-top: 1px dashed var(--ink-faded);
+  padding-top: 14px;
+}
+details.solution summary {
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--vermilion);
+  user-select: none;
+  list-style: none;
+  display: inline-flex; align-items: center; gap: 8px;
+}
+details.solution summary::-webkit-details-marker { display: none; }
+details.solution summary::before {
+  content: "▸"; transition: transform 0.2s; display: inline-block;
+}
+details.solution[open] summary::before { transform: rotate(90deg); }
+
+/* ============================================================
+   STATS / VISUAL ELEMENTS
+   ============================================================ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0;
+  margin: 2em 0;
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+}
+.stat {
+  padding: 24px 20px;
+  border-right: 1px solid var(--ink);
+  text-align: left;
+}
+.stat:last-child { border-right: 0; }
+.stat .big {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 4vw, 3.4rem);
+  font-weight: 300;
+  font-style: italic;
+  color: var(--vermilion);
+  line-height: 1;
+}
+.stat .lbl {
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  margin-top: 8px;
+  display: block;
+}
+
+/* Data type cards */
+.type-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 14px;
+  margin: 1.6em 0;
+}
+.type-card {
+  border: 1px solid var(--ink);
+  padding: 18px 16px;
+  background: var(--cream-soft);
+  transition: transform 0.3s, background 0.3s;
+}
+.type-card:hover {
+  transform: translateY(-3px);
+  background: var(--cream-deep);
+}
+.type-card .name {
+  font-family: var(--font-mono);
+  font-size: 0.88rem;
+  color: var(--vermilion);
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+.type-card .desc {
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-style: italic;
+  color: var(--ink-soft);
+  margin-bottom: 10px;
+  line-height: 1.3;
+}
+.type-card .ex {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  background: var(--code-bg);
+  color: var(--code-fg);
+  padding: 6px 10px;
+  display: inline-block;
+}
+
+/* ============================================================
+   PLAYGROUND (large)
+   ============================================================ */
+section.playground {
+  padding: clamp(60px, 9vw, 110px) 0;
+  background: var(--ink);
+  color: var(--cream);
+  border-bottom: 1px solid var(--ink);
+}
+section.playground h2 { color: var(--cream); font-style: italic; }
+section.playground .chapter-num { color: var(--ochre); }
+section.playground .lede { color: var(--cream-deep); }
+section.playground .chapter-num small { color: var(--cream-deep); }
+section.playground .live-code { border-color: var(--cream); }
+section.playground .CodeMirror { min-height: 280px; font-size: 0.98rem; }
+
+/* ============================================================
+   HOMEWORK
+   ============================================================ */
+section.homework {
+  padding: clamp(60px, 9vw, 120px) 0;
+  background: var(--vermilion);
+  color: var(--cream);
+  position: relative;
+  overflow: hidden;
+}
+section.homework::after {
+  content: "★";
+  position: absolute;
+  font-family: var(--font-display);
+  font-size: 30rem;
+  color: rgba(239, 230, 210, 0.06);
+  right: -3rem; bottom: -8rem;
+  line-height: 0.8;
+  pointer-events: none;
+}
+section.homework .chapter-num { color: var(--ochre); }
+section.homework h2 { color: var(--cream); font-style: italic; }
+section.homework .lede { color: var(--cream); }
+section.homework .chapter-num small { color: var(--cream); opacity: 0.7; }
+section.homework .eyebrow { color: var(--cream); opacity: 0.8; }
+section.homework .eyebrow::before { background: var(--cream); }
+section.homework .box {
+  background: rgba(0,0,0,0.18);
+  border-color: var(--cream);
+  color: var(--cream);
+}
+section.homework .box h4 { color: var(--ochre); }
+section.homework .live-code { border-color: var(--cream); }
+section.homework code { background: rgba(0,0,0,0.25); color: var(--cream); }
+
+.homework-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(20px, 3vw, 40px);
+  margin-top: 2em;
+}
+@media (max-width: 800px) { .homework-grid { grid-template-columns: 1fr; } }
+
+.steps-list {
+  list-style: none;
+  padding: 0;
+  margin: 1em 0;
+  counter-reset: step;
+}
+.steps-list li {
+  counter-increment: step;
+  padding: 14px 0 14px 56px;
+  border-top: 1px solid rgba(239,230,210,0.3);
+  position: relative;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  line-height: 1.45;
+}
+.steps-list li:last-child { border-bottom: 1px solid rgba(239,230,210,0.3); }
+.steps-list li::before {
+  content: counter(step, decimal-leading-zero);
+  position: absolute; left: 0; top: 14px;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.15em;
+  color: var(--ochre);
+  border: 1px solid var(--ochre);
+  padding: 3px 8px;
+  background: rgba(0,0,0,0.18);
+}
+
+/* ============================================================
+   FOOTER
+   ============================================================ */
+footer.foot {
+  padding: clamp(50px, 7vw, 90px) 0 30px;
+  border-top: 4px solid var(--ink);
+  background: var(--cream);
+}
+.foot-grid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr 1fr;
+  gap: 40px;
+  align-items: end;
+  margin-bottom: 60px;
+}
+@media (max-width: 800px) { .foot-grid { grid-template-columns: 1fr; gap: 30px; } }
+.foot-grid h3 { font-style: italic; font-size: 2rem; }
+.foot-col h4 { color: var(--vermilion); margin-bottom: 10px; }
+.foot-col p { font-size: 0.94rem; color: var(--ink-soft); }
+.foot-bar {
+  display: flex; justify-content: space-between; padding-top: 24px;
+  border-top: 1px solid var(--ink);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+  flex-wrap: wrap; gap: 12px;
+}
+
+/* ============================================================
+   ANIMATIONS
+   ============================================================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(28px);
+  transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+.reveal.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* Marquee */
+.marquee {
+  border-top: 1px solid var(--ink);
+  border-bottom: 1px solid var(--ink);
+  overflow: hidden;
+  padding: 16px 0;
+  background: var(--cream);
+  position: relative;
+}
+.marquee-inner {
+  display: flex;
+  gap: 60px;
+  white-space: nowrap;
+  animation: scroll 38s linear infinite;
+  font-family: var(--font-display);
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  font-style: italic;
+  font-weight: 300;
+  color: var(--ink);
+}
+.marquee-inner span { display: inline-flex; align-items: center; gap: 60px; }
+.marquee-inner em { color: var(--vermilion); font-style: italic; }
+.marquee-inner .sep { color: var(--vermilion); }
+@keyframes scroll {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* Loading bar */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--cream);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity .6s ease;
+}
+.loading-overlay.hide { opacity: 0; pointer-events: none; }
+.loading-inner { text-align: center; max-width: 360px; padding: 20px; }
+.loading-inner .lo-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 2rem;
+  margin-bottom: 18px;
+}
+.loading-inner .lo-bar {
+  height: 2px;
+  background: var(--ink-faded);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 14px;
+}
+.loading-inner .lo-bar::after {
+  content: "";
+  position: absolute; inset: 0;
+  background: var(--vermilion);
+  animation: load 1.4s ease-in-out infinite;
+}
+@keyframes load {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+.loading-inner .lo-sub {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+}
+
+/* Helpful: tiny print */
+.tiny {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-faded);
+}
+
+</style>
+</head>
+<body>
+
+<!-- ============================================================
+     LOADING OVERLAY (Pyodide warm-up)
+     ============================================================ -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loading-inner">
+    <div class="lo-title">The Python Almanac</div>
+    <div class="lo-bar"></div>
+    <div class="lo-sub" id="loadingMsg">Warming the compiler · please wait</div>
+  </div>
+</div>
+
+<!-- ============================================================
+     NAVIGATION
+     ============================================================ -->
+<nav class="masthead-nav">
+  <div class="wrap">
+    <a href="#top" class="brand"><span class="dot">●</span> The Python Almanac</a>
+    <div class="nav-links">
+      <a href="#contents">Contents</a>
+      <a href="#ch01">Begin</a>
+      <a href="#playground">Playground</a>
+      <a href="#homework">Homework</a>
+    </div>
+    <div class="compiler-status" id="status">
+      <span class="pulse"></span>
+      <span id="statusText">Booting compiler</span>
+    </div>
+  </div>
+</nav>
+
+<!-- ============================================================
+     HERO
+     ============================================================ -->
+<header class="hero" id="top">
+  <svg class="snake-deco" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M20,100 Q40,40 80,60 T140,80 Q180,90 170,140 T100,170 Q40,180 30,140" stroke="currentColor" stroke-width="2" fill="none"/>
+    <path d="M20,100 Q40,40 80,60 T140,80 Q180,90 170,140 T100,170 Q40,180 30,140" stroke="currentColor" stroke-width="0.5" fill="none" stroke-dasharray="2 6"/>
+    <circle cx="25" cy="95" r="3" fill="currentColor"/>
+  </svg>
+
+  <div class="wrap">
+    <div class="hero-meta">
+      <span>Volume 01</span>
+      <span>An Introduction</span>
+      <span>Demo Edition</span>
+      <span id="todayDate">2026</span>
+    </div>
+
+    <div class="hero-grid">
+      <div class="hero-title reveal">
+        <div class="eyebrow">A field guide for first-time programmers</div>
+        <h1 style="margin-top: 18px;">Hello,<br><span class="amp">&</span> welcome to <em class="serif-italic" style="color: var(--vermilion);">Python.</em></h1>
+        <p class="hero-sub">
+          A small, beautiful tour of the world's most-loved programming language &mdash; with a live compiler tucked into the page, exercises to chew on, and a homework game to take home.
+        </p>
+        <a href="#ch01" class="scroll-hint">Begin Reading &nbsp; <span class="arrow">↓</span></a>
+      </div>
+
+      <aside class="hero-side reveal" style="transition-delay: .15s;">
+        <div class="label">Today's Session</div>
+        <h3 style="margin-bottom: 14px;">What you'll leave with</h3>
+        <p>The ability to read Python, write your first scripts, understand how programs <em>think</em>, and the confidence to take on a small game project at home tonight.</p>
+
+        <div class="label" style="margin-top: 26px;">Tools you'll need</div>
+        <p>Nothing. The compiler runs inside this page &mdash; press <kbd>Run</kbd> on any code block and watch it execute.</p>
+      </aside>
+    </div>
+  </div>
+</header>
+
+<!-- ============================================================
+     MARQUEE
+     ============================================================ -->
+<div class="marquee" aria-hidden="true">
+  <div class="marquee-inner">
+    <span>
+      <em>print</em> &nbsp; · &nbsp; variables &nbsp; · &nbsp; <em>strings</em> &nbsp; · &nbsp; lists &nbsp; · &nbsp; <em>loops</em> &nbsp; · &nbsp; conditionals &nbsp; · &nbsp; <em>functions</em> &nbsp; · &nbsp; games &nbsp; · &nbsp; <em>play</em> &nbsp; ★ &nbsp;
+      <em>print</em> &nbsp; · &nbsp; variables &nbsp; · &nbsp; <em>strings</em> &nbsp; · &nbsp; lists &nbsp; · &nbsp; <em>loops</em> &nbsp; · &nbsp; conditionals &nbsp; · &nbsp; <em>functions</em> &nbsp; · &nbsp; games &nbsp; · &nbsp; <em>play</em> &nbsp; ★ &nbsp;
+    </span>
+  </div>
+</div>
+
+<!-- ============================================================
+     TABLE OF CONTENTS
+     ============================================================ -->
+<section class="toc" id="contents">
+  <div class="wrap">
+    <div class="toc-grid">
+      <div class="toc-label reveal">
+        <div class="eyebrow">Contents</div>
+        <h2 style="margin-top: 14px;">In this issue</h2>
+      </div>
+      <div class="toc-list reveal" style="transition-delay: .1s;">
+        <a href="#ch01" class="toc-item"><span class="toc-num">01</span><span class="toc-title">What is Python?<em>The why and the who</em></span></a>
+        <a href="#ch02" class="toc-item"><span class="toc-num">02</span><span class="toc-title">Your First Program<em>Hello, World!</em></span></a>
+        <a href="#ch03" class="toc-item"><span class="toc-num">03</span><span class="toc-title">Variables &amp; Types<em>Boxes for your data</em></span></a>
+        <a href="#ch04" class="toc-item"><span class="toc-num">04</span><span class="toc-title">Operators &amp; Math<em>Making things happen</em></span></a>
+        <a href="#ch05" class="toc-item"><span class="toc-num">05</span><span class="toc-title">Strings<em>Working with text</em></span></a>
+        <a href="#ch06" class="toc-item"><span class="toc-num">06</span><span class="toc-title">Lists<em>Collections of things</em></span></a>
+        <a href="#ch07" class="toc-item"><span class="toc-num">07</span><span class="toc-title">Conditionals<em>If this, then that</em></span></a>
+        <a href="#ch08" class="toc-item"><span class="toc-num">08</span><span class="toc-title">Loops<em>Doing things again</em></span></a>
+        <a href="#ch09" class="toc-item"><span class="toc-num">09</span><span class="toc-title">Functions<em>Reusable instructions</em></span></a>
+        <a href="#playground" class="toc-item"><span class="toc-num">10</span><span class="toc-title">The Playground<em>A blank canvas</em></span></a>
+        <a href="#homework" class="toc-item"><span class="toc-num">★</span><span class="toc-title">Homework: A Game<em>Build it tonight</em></span></a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHAPTER 01 — What is Python?
+     ============================================================ -->
+<section class="chapter" id="ch01">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">01<small>Chapter One</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">The Origin Story</div>
+        <h2 style="margin-top: 14px;">What is <em class="serif-italic">Python?</em></h2>
+        <p class="lede">A language designed to be <em>read by humans</em>, accidentally named after a British comedy troupe, and now quietly running about half of modern software.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p class="dropcap">Python is a <strong>high-level, general-purpose programming language</strong>. Translation: you tell a computer what you want, in something close to English, and Python figures out how to make the machine do it. It was created by a Dutch programmer named <em class="serif-italic">Guido van Rossum</em> in 1991, who took the name not from the snake but from <em class="serif-italic">Monty Python's Flying Circus</em>. (You'll find <code>spam</code> and <code>eggs</code> hiding in the documentation to this day.)</p>
+
+        <p>Today, Python powers the recommendation engine on Netflix, the artificial intelligence behind ChatGPT, scientific simulations at NASA, financial models at Wall Street firms, and probably the homework of every CS student in the country. Its superpower is simple: <em class="serif-italic">it gets out of your way.</em></p>
+
+        <div class="callout">"Python is executable pseudocode. Perl is executable line noise." &mdash; an old programmer's joke that, unfortunately for Perl, has aged well.</div>
+      </div>
+
+      <div class="stats-row">
+        <div class="stat"><div class="big">#1</div><span class="lbl">Most-used language</span></div>
+        <div class="stat"><div class="big">1991</div><span class="lbl">First released</span></div>
+        <div class="stat"><div class="big">15M+</div><span class="lbl">Developers worldwide</span></div>
+        <div class="stat"><div class="big">∞</div><span class="lbl">Things you can build</span></div>
+      </div>
+
+      <div class="col-text">
+        <h3 style="margin: 1.4em 0 0.4em;">Why Python, of all things?</h3>
+        <ul style="padding-left: 1.2em;">
+          <li><strong>Readable.</strong> The syntax looks like a recipe, not algebra.</li>
+          <li><strong>Batteries included.</strong> A massive standard library means you rarely start from zero.</li>
+          <li><strong>Versatile.</strong> Web apps, data science, AI, automation, game prototypes, scripts &mdash; all in one language.</li>
+          <li><strong>Beginner-friendly, expert-deep.</strong> You can write your first program in an hour and still be learning new things ten years in.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHAPTER 02 — Your First Program
+     ============================================================ -->
+<section class="chapter" id="ch02">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">02<small>Chapter Two</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">First Words</div>
+        <h2 style="margin-top: 14px;">Your <em class="serif-italic">first</em> program</h2>
+        <p class="lede">There is an unbroken tradition, going back to <em>1972</em>, that the first program in any language must say <em>"Hello, World!"</em> &mdash; and we will not break it today.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p>In Python, you tell the computer to say something using the <code>print()</code> function. The word in quotes is called a <strong>string</strong> &mdash; just a piece of text. Click the yellow <kbd>Run</kbd> button below to make it speak.</p>
+      </div>
+
+      <!-- LIVE CODE BLOCK -->
+      <div class="live-code" data-code='print("Hello, World!")'>
+        <div class="code-bar">
+          <div class="left">
+            <span class="dots"><span></span><span></span><span></span></span>
+            <span>hello.py</span>
+          </div>
+          <div class="right">Python 3</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor">print("Hello, World!")</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+
+      <div class="col-text">
+        <p>It worked, didn't it? You just wrote, compiled, and ran a real Python program <em class="serif-italic">inside a web page.</em> Try changing the text between the quotes to anything you like &mdash; your name, a joke, a greeting in another language &mdash; and hit Run again.</p>
+
+        <div class="box">
+          <h4>Anatomy of the line</h4>
+          <ul>
+            <li><code>print</code> &mdash; the name of a built-in function</li>
+            <li><code>(&nbsp;)</code> &mdash; parentheses say "call this function"</li>
+            <li><code>"Hello, World!"</code> &mdash; a <strong>string</strong>, the data we hand to the function</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHAPTER 03 — Variables & Types
+     ============================================================ -->
+<section class="chapter" id="ch03">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">03<small>Chapter Three</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">Storing Things</div>
+        <h2 style="margin-top: 14px;">Variables &amp; <em class="serif-italic">Types</em></h2>
+        <p class="lede">A variable is just a <em>name with a value attached</em>. Picture a labelled jar on a shelf: you put something inside, and you can fetch it back later by the label.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p>In Python you don't have to declare what kind of thing a variable will hold. You just write <code>name = value</code> and Python figures it out.</p>
+      </div>
+
+      <div class="live-code" data-code='name = "Ada"
+age = 17
+height = 5.4
+is_student = True
+
+print("Name:", name)
+print("Age:", age)
+print("Height:", height, "ft")
+print("Student?", is_student)'>
+        <div class="code-bar">
+          <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>variables.py</span></div>
+          <div class="right">Python 3</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor">name = "Ada"
+age = 17
+height = 5.4
+is_student = True
+
+print("Name:", name)
+print("Age:", age)
+print("Height:", height, "ft")
+print("Student?", is_student)</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+
+      <div class="col-text">
+        <p>Each variable above holds a different <strong>type</strong> of value. Python recognises four basic ones to start with:</p>
+      </div>
+
+      <div class="type-grid">
+        <div class="type-card">
+          <div class="name">int</div>
+          <div class="desc">Whole numbers, positive or negative</div>
+          <div class="ex">age = 17</div>
+        </div>
+        <div class="type-card">
+          <div class="name">float</div>
+          <div class="desc">Numbers with a decimal point</div>
+          <div class="ex">pi = 3.14</div>
+        </div>
+        <div class="type-card">
+          <div class="name">str</div>
+          <div class="desc">Text, wrapped in quotes</div>
+          <div class="ex">name = "Ada"</div>
+        </div>
+        <div class="type-card">
+          <div class="name">bool</div>
+          <div class="desc">True or False — nothing else</div>
+          <div class="ex">on = True</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-head">
+          <span class="ex-tag">Exercise 3.1</span>
+          <h3>Introduce yourself</h3>
+        </div>
+        <p>Create four variables &mdash; your <code>name</code>, your <code>age</code>, your <code>favorite_color</code>, and whether you <code>likes_coffee</code> &mdash; then print them out as a single friendly sentence.</p>
+        <p class="hint">Hint: <code>print()</code> can take multiple values separated by commas, and it'll glue them together for you.</p>
+
+        <div class="live-code" data-code='# Your code here:
+
+'>
+          <div class="code-bar">
+            <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>exercise_3_1.py</span></div>
+            <div class="right">Your turn</div>
+          </div>
+          <div class="editor-area"><textarea class="cm-editor"># Your code here:
+
+</textarea></div>
+          <div class="live-code-toolbar">
+            <button class="btn-run"><span class="play"></span> Run</button>
+            <button class="btn-reset">Reset</button>
+          </div>
+          <div class="output-pane"></div>
+        </div>
+
+        <details class="solution">
+          <summary>Reveal a solution</summary>
+          <div class="code-block">
+            <div class="code-bar"><div class="left"><span class="dots"><span></span><span></span><span></span></span><span>solution.py</span></div><div class="right">one way to do it</div></div>
+<pre class="static-code"><span class="tok-com"># A friendly little introduction</span>
+name = <span class="tok-str">"Maya"</span>
+age = <span class="tok-num">19</span>
+favorite_color = <span class="tok-str">"sea green"</span>
+likes_coffee = <span class="tok-key">True</span>
+
+<span class="tok-fn">print</span>(<span class="tok-str">"Hi, I'm"</span>, name,
+      <span class="tok-str">"— I'm"</span>, age, <span class="tok-str">"years old,"</span>,
+      <span class="tok-str">"my favorite color is"</span>, favorite_color,
+      <span class="tok-str">"and I"</span>,
+      <span class="tok-str">"drink coffee."</span> <span class="tok-key">if</span> likes_coffee <span class="tok-key">else</span> <span class="tok-str">"don't drink coffee."</span>)</pre>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHAPTER 04 — Operators
+     ============================================================ -->
+<section class="chapter" id="ch04">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">04<small>Chapter Four</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">Doing Things</div>
+        <h2 style="margin-top: 14px;">Operators &amp; <em class="serif-italic">Math</em></h2>
+        <p class="lede">Once you have values, you'll want to <em>combine</em> them. Python uses the same symbols as a calculator, plus a few extras worth knowing.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p>The standard arithmetic operators are <code>+</code>, <code>-</code>, <code>*</code>, <code>/</code>. Python adds <code>**</code> for powers, <code>%</code> for remainders, and <code>//</code> for integer division. Tweak the numbers and run it:</p>
+      </div>
+
+      <div class="live-code" data-code='print("Addition:       ", 7 + 3)
+print("Subtraction:    ", 7 - 3)
+print("Multiplication: ", 7 * 3)
+print("Division:       ", 7 / 3)
+print("Integer divide: ", 7 // 3)
+print("Remainder:      ", 7 % 3)
+print("Power:          ", 7 ** 3)'>
+        <div class="code-bar">
+          <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>math.py</span></div>
+          <div class="right">Python 3</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor">print("Addition:       ", 7 + 3)
+print("Subtraction:    ", 7 - 3)
+print("Multiplication: ", 7 * 3)
+print("Division:       ", 7 / 3)
+print("Integer divide: ", 7 // 3)
+print("Remainder:      ", 7 % 3)
+print("Power:          ", 7 ** 3)</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+
+      <div class="col-text">
+        <h3 style="margin: 1.4em 0 0.4em;">Comparison &amp; logic</h3>
+        <p>Comparisons return <code>True</code> or <code>False</code>. They're the building blocks of decisions, which we'll meet in Chapter 7.</p>
+
+        <div class="box">
+          <h4>Quick reference</h4>
+          <ul>
+            <li><code>==</code> equal to &nbsp;·&nbsp; <code>!=</code> not equal</li>
+            <li><code>&lt;</code> less than &nbsp;·&nbsp; <code>&gt;</code> greater than</li>
+            <li><code>&lt;=</code> at most &nbsp;·&nbsp; <code>&gt;=</code> at least</li>
+            <li><code>and</code>, <code>or</code>, <code>not</code> &mdash; combine boolean values</li>
+          </ul>
+        </div>
+
+        <div class="callout">Watch out: <code>=</code> assigns a value, while <code>==</code> tests for equality. A single equals sign is a verb; a double equals sign is a question.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHAPTER 05 — Strings
+     ============================================================ -->
+<section class="chapter" id="ch05">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">05<small>Chapter Five</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">Working with Text</div>
+        <h2 style="margin-top: 14px;"><em class="serif-italic">Strings,</em> and what to do with them</h2>
+        <p class="lede">Text is the raw material of conversation. Python gives you a small toolkit for cutting, joining, and re-shaping it &mdash; and one elegant trick called the <em>f-string</em>.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p>Strings can be added together (called <em class="serif-italic">concatenation</em>), repeated, indexed by position, and sliced. Best of all, they can be slotted into a sentence with f-strings:</p>
+      </div>
+
+      <div class="live-code" data-code='first = "Grace"
+last = "Hopper"
+
+# Concatenation
+full = first + " " + last
+print(full)
+
+# Repetition
+print("ha" * 4)
+
+# Indexing & slicing
+word = "computer"
+print(word[0])      # first character
+print(word[-1])     # last character
+print(word[0:4])    # first four
+
+# f-strings — the modern way to format text
+year = 1906
+print(f"{full} was born in {year}.")'>
+        <div class="code-bar">
+          <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>strings.py</span></div>
+          <div class="right">Python 3</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor">first = "Grace"
+last = "Hopper"
+
+# Concatenation
+full = first + " " + last
+print(full)
+
+# Repetition
+print("ha" * 4)
+
+# Indexing & slicing
+word = "computer"
+print(word[0])      # first character
+print(word[-1])     # last character
+print(word[0:4])    # first four
+
+# f-strings — the modern way to format text
+year = 1906
+print(f"{full} was born in {year}.")</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+
+      <div class="col-text">
+        <p>Strings also come with useful built-in methods. Try chaining a few:</p>
+      </div>
+
+      <div class="code-block">
+        <div class="code-bar"><div class="left"><span class="dots"><span></span><span></span><span></span></span><span>string_methods.py</span></div><div class="right">reference</div></div>
+<pre class="static-code">name = <span class="tok-str">"  ada lovelace  "</span>
+
+name.<span class="tok-fn">strip</span>()       <span class="tok-com"># "ada lovelace"     — trim whitespace</span>
+name.<span class="tok-fn">upper</span>()       <span class="tok-com"># "  ADA LOVELACE  " — all caps</span>
+name.<span class="tok-fn">title</span>()       <span class="tok-com"># "  Ada Lovelace  " — Title Case</span>
+name.<span class="tok-fn">replace</span>(<span class="tok-str">"ada"</span>, <span class="tok-str">"Ada"</span>)  <span class="tok-com"># swap a word</span>
+<span class="tok-fn">len</span>(name)          <span class="tok-com"># 16 — number of characters</span></pre>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHAPTER 06 — Lists
+     ============================================================ -->
+<section class="chapter" id="ch06">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">06<small>Chapter Six</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">Collections</div>
+        <h2 style="margin-top: 14px;"><em class="serif-italic">Lists</em></h2>
+        <p class="lede">Most data in the world is plural. A grocery list. The students in a classroom. Frames in an animation. Python's <em>list</em> is your everyday container.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p>A list is written with square brackets, items separated by commas. Lists can hold anything &mdash; numbers, strings, even other lists.</p>
+      </div>
+
+      <div class="live-code" data-code='fruits = ["apple", "banana", "cherry", "date"]
+
+print(fruits)                # the whole list
+print(fruits[0])             # first item
+print(fruits[-1])            # last item
+print(len(fruits), "fruits") # how many
+
+# Mutating the list
+fruits.append("elderberry")  # add to the end
+fruits[1] = "blueberry"      # replace by index
+print(fruits)
+
+# Slicing
+print(fruits[1:3])           # items 1 and 2'>
+        <div class="code-bar">
+          <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>lists.py</span></div>
+          <div class="right">Python 3</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor">fruits = ["apple", "banana", "cherry", "date"]
+
+print(fruits)                # the whole list
+print(fruits[0])             # first item
+print(fruits[-1])            # last item
+print(len(fruits), "fruits") # how many
+
+# Mutating the list
+fruits.append("elderberry")  # add to the end
+fruits[1] = "blueberry"      # replace by index
+print(fruits)
+
+# Slicing
+print(fruits[1:3])           # items 1 and 2</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+
+      <div class="col-text">
+        <div class="callout">Python is <em>zero-indexed</em>: the first element is at position <code>0</code>, not <code>1</code>. This trips up everyone exactly once. It's a rite of passage.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHAPTER 07 — Conditionals
+     ============================================================ -->
+<section class="chapter" id="ch07">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">07<small>Chapter Seven</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">Making Decisions</div>
+        <h2 style="margin-top: 14px;">If <em class="serif-italic">this,</em> then <em class="serif-italic">that</em></h2>
+        <p class="lede">A program that always does the same thing isn't terribly useful. The <em>if</em> statement gives your code the power to take different paths depending on what's true.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p>Python uses <strong>indentation</strong> (the whitespace at the start of a line) to decide what belongs inside the <code>if</code>. This is one of Python's most distinctive features &mdash; the layout <em class="serif-italic">is</em> the structure.</p>
+      </div>
+
+      <div class="live-code" data-code='score = 82
+
+if score >= 90:
+    grade = "A"
+elif score >= 80:
+    grade = "B"
+elif score >= 70:
+    grade = "C"
+elif score >= 60:
+    grade = "D"
+else:
+    grade = "F"
+
+print(f"Score: {score} → Grade: {grade}")
+
+# Try changing score above and re-running.'>
+        <div class="code-bar">
+          <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>grading.py</span></div>
+          <div class="right">Python 3</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor">score = 82
+
+if score >= 90:
+    grade = "A"
+elif score >= 80:
+    grade = "B"
+elif score >= 70:
+    grade = "C"
+elif score >= 60:
+    grade = "D"
+else:
+    grade = "F"
+
+print(f"Score: {score} → Grade: {grade}")
+
+# Try changing score above and re-running.</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+
+      <div class="col-text">
+        <div class="box">
+          <h4>The shape of an if</h4>
+          <ul>
+            <li><code>if</code> &mdash; the first thing to check</li>
+            <li><code>elif</code> &mdash; short for "else if", checked only if everything above is false</li>
+            <li><code>else</code> &mdash; the catch-all when nothing matched</li>
+            <li>Every line inside a branch must be indented (4 spaces is the convention)</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-head">
+          <span class="ex-tag">Exercise 7.1</span>
+          <h3>FizzBuzz, one number at a time</h3>
+        </div>
+        <p>Given a number, print <code>"Fizz"</code> if it's divisible by 3, <code>"Buzz"</code> if it's divisible by 5, <code>"FizzBuzz"</code> if it's divisible by both, and the number itself otherwise.</p>
+        <p class="hint">Hint: "divisible by 3" means <code>n % 3 == 0</code>. Test <code>n = 15</code> &mdash; you should get "FizzBuzz".</p>
+
+        <div class="live-code" data-code='n = 15
+
+# Your code here:
+'>
+          <div class="code-bar">
+            <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>fizzbuzz.py</span></div>
+            <div class="right">Your turn</div>
+          </div>
+          <div class="editor-area"><textarea class="cm-editor">n = 15
+
+# Your code here:
+</textarea></div>
+          <div class="live-code-toolbar">
+            <button class="btn-run"><span class="play"></span> Run</button>
+            <button class="btn-reset">Reset</button>
+          </div>
+          <div class="output-pane"></div>
+        </div>
+
+        <details class="solution">
+          <summary>Reveal a solution</summary>
+          <div class="code-block">
+            <div class="code-bar"><div class="left"><span class="dots"><span></span><span></span><span></span></span><span>solution.py</span></div><div class="right">one way</div></div>
+<pre class="static-code">n = <span class="tok-num">15</span>
+
+<span class="tok-key">if</span> n % <span class="tok-num">3</span> == <span class="tok-num">0</span> <span class="tok-key">and</span> n % <span class="tok-num">5</span> == <span class="tok-num">0</span>:
+    <span class="tok-fn">print</span>(<span class="tok-str">"FizzBuzz"</span>)
+<span class="tok-key">elif</span> n % <span class="tok-num">3</span> == <span class="tok-num">0</span>:
+    <span class="tok-fn">print</span>(<span class="tok-str">"Fizz"</span>)
+<span class="tok-key">elif</span> n % <span class="tok-num">5</span> == <span class="tok-num">0</span>:
+    <span class="tok-fn">print</span>(<span class="tok-str">"Buzz"</span>)
+<span class="tok-key">else</span>:
+    <span class="tok-fn">print</span>(n)</pre>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHAPTER 08 — Loops
+     ============================================================ -->
+<section class="chapter" id="ch08">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">08<small>Chapter Eight</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">Repetition</div>
+        <h2 style="margin-top: 14px;"><em class="serif-italic">Loops</em></h2>
+        <p class="lede">Computers are tireless. Where humans get bored at the second repetition, a computer happily does the same thing <em>a billion times in a row</em>. Loops are how you ask them to.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p>Python has two kinds of loops. A <code>for</code> loop walks through a sequence one item at a time. A <code>while</code> loop keeps going as long as some condition holds.</p>
+      </div>
+
+      <div class="live-code" data-code='# A for loop over a list
+colors = ["red", "amber", "green"]
+for c in colors:
+    print("Light is:", c)
+
+print("---")
+
+# A for loop over a range of numbers
+for i in range(1, 6):
+    print(i, "squared is", i * i)
+
+print("---")
+
+# A while loop — stops when condition becomes False
+countdown = 5
+while countdown > 0:
+    print("Liftoff in", countdown)
+    countdown = countdown - 1
+print("🚀")'>
+        <div class="code-bar">
+          <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>loops.py</span></div>
+          <div class="right">Python 3</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor"># A for loop over a list
+colors = ["red", "amber", "green"]
+for c in colors:
+    print("Light is:", c)
+
+print("---")
+
+# A for loop over a range of numbers
+for i in range(1, 6):
+    print(i, "squared is", i * i)
+
+print("---")
+
+# A while loop — stops when condition becomes False
+countdown = 5
+while countdown > 0:
+    print("Liftoff in", countdown)
+    countdown = countdown - 1
+print("🚀")</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+
+      <div class="col-text">
+        <div class="callout">A common rookie error: a <code>while</code> loop whose condition never becomes false. Your program runs forever. (Don't worry, the browser will eventually stop it. Probably.)</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     CHAPTER 09 — Functions
+     ============================================================ -->
+<section class="chapter" id="ch09">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">09<small>Chapter Nine</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">Reusable Recipes</div>
+        <h2 style="margin-top: 14px;"><em class="serif-italic">Functions</em></h2>
+        <p class="lede">When you find yourself copy-pasting the same lines of code, it's time to <em>bottle them up</em> and give them a name. That bottle is called a function.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p>Define a function with <code>def</code>. Give it a name, list its inputs (called <em class="serif-italic">parameters</em>), and write what it should do. Use <code>return</code> to hand a value back to the caller.</p>
+      </div>
+
+      <div class="live-code" data-code='def greet(name):
+    """Say hello to someone by name."""
+    return f"Hello, {name}!"
+
+def area_of_rectangle(width, height):
+    return width * height
+
+def is_even(n):
+    return n % 2 == 0
+
+# Calling the functions
+print(greet("Ada"))
+print(greet("Alan"))
+
+print("Area:", area_of_rectangle(5, 3))
+
+print("Is 7 even?", is_even(7))
+print("Is 8 even?", is_even(8))'>
+        <div class="code-bar">
+          <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>functions.py</span></div>
+          <div class="right">Python 3</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor">def greet(name):
+    """Say hello to someone by name."""
+    return f"Hello, {name}!"
+
+def area_of_rectangle(width, height):
+    return width * height
+
+def is_even(n):
+    return n % 2 == 0
+
+# Calling the functions
+print(greet("Ada"))
+print(greet("Alan"))
+
+print("Area:", area_of_rectangle(5, 3))
+
+print("Is 7 even?", is_even(7))
+print("Is 8 even?", is_even(8))</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+
+      <div class="col-text">
+        <div class="box">
+          <h4>Why bother with functions?</h4>
+          <ul>
+            <li><strong>Less repetition</strong> &mdash; write it once, call it everywhere.</li>
+            <li><strong>Easier to read</strong> &mdash; a well-named function tells you <em>what</em>, not <em>how</em>.</li>
+            <li><strong>Easier to fix</strong> &mdash; one change updates every caller.</li>
+            <li><strong>Easier to test</strong> &mdash; each piece can be checked in isolation.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-head">
+          <span class="ex-tag">Exercise 9.1</span>
+          <h3>Write a function</h3>
+        </div>
+        <p>Write a function called <code>celsius_to_fahrenheit</code> that takes a temperature in Celsius and returns the Fahrenheit equivalent. Formula: <code>F = C × 9/5 + 32</code>.</p>
+        <p class="hint">Test it: 0&deg;C should give 32&deg;F. 100&deg;C should give 212&deg;F.</p>
+
+        <div class="live-code" data-code='def celsius_to_fahrenheit(c):
+    # Your code here:
+    pass
+
+# Test it:
+print(celsius_to_fahrenheit(0))
+print(celsius_to_fahrenheit(100))
+print(celsius_to_fahrenheit(37))'>
+          <div class="code-bar">
+            <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>convert.py</span></div>
+            <div class="right">Your turn</div>
+          </div>
+          <div class="editor-area"><textarea class="cm-editor">def celsius_to_fahrenheit(c):
+    # Your code here:
+    pass
+
+# Test it:
+print(celsius_to_fahrenheit(0))
+print(celsius_to_fahrenheit(100))
+print(celsius_to_fahrenheit(37))</textarea></div>
+          <div class="live-code-toolbar">
+            <button class="btn-run"><span class="play"></span> Run</button>
+            <button class="btn-reset">Reset</button>
+          </div>
+          <div class="output-pane"></div>
+        </div>
+
+        <details class="solution">
+          <summary>Reveal a solution</summary>
+          <div class="code-block">
+            <div class="code-bar"><div class="left"><span class="dots"><span></span><span></span><span></span></span><span>solution.py</span></div><div class="right">one way</div></div>
+<pre class="static-code"><span class="tok-key">def</span> <span class="tok-fn">celsius_to_fahrenheit</span>(c):
+    <span class="tok-key">return</span> c * <span class="tok-num">9</span> / <span class="tok-num">5</span> + <span class="tok-num">32</span>
+
+<span class="tok-fn">print</span>(<span class="tok-fn">celsius_to_fahrenheit</span>(<span class="tok-num">0</span>))    <span class="tok-com"># 32.0</span>
+<span class="tok-fn">print</span>(<span class="tok-fn">celsius_to_fahrenheit</span>(<span class="tok-num">100</span>))  <span class="tok-com"># 212.0</span>
+<span class="tok-fn">print</span>(<span class="tok-fn">celsius_to_fahrenheit</span>(<span class="tok-num">37</span>))   <span class="tok-com"># 98.6 — body temperature</span></pre>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Ornament between sections -->
+<div class="wrap"><div class="ornament">✦ &nbsp; ✦ &nbsp; ✦</div></div>
+
+<!-- ============================================================
+     CHAPTER 10 — Playground
+     ============================================================ -->
+<section class="chapter playground" id="playground">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">10<small>Chapter Ten</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">A Blank Canvas</div>
+        <h2 style="margin-top: 14px;">The <em class="serif-italic">Playground</em></h2>
+        <p class="lede">Everything you've learned, in one place. Write whatever you like. Combine variables, loops, functions &mdash; see what happens.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="live-code" data-code='# Welcome to the playground. Try anything!
+# Here is a starter — pick any one, or delete it all.
+
+import random
+
+# ─── Generate a random poem ─────────────
+adjectives = ["quiet", "luminous", "fractal", "infinite", "ancient", "soft"]
+nouns      = ["river", "circuit", "echo", "garden", "machine", "dream"]
+verbs      = ["sings", "remembers", "forgets", "dances", "calculates"]
+
+for line in range(4):
+    a = random.choice(adjectives)
+    n = random.choice(nouns)
+    v = random.choice(verbs)
+    print(f"The {a} {n} {v}.")
+
+print()
+print("— made by a Python program")'>
+        <div class="code-bar">
+          <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>playground.py</span></div>
+          <div class="right">No rules</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor"># Welcome to the playground. Try anything!
+# Here is a starter — pick any one, or delete it all.
+
+import random
+
+# ─── Generate a random poem ─────────────
+adjectives = ["quiet", "luminous", "fractal", "infinite", "ancient", "soft"]
+nouns      = ["river", "circuit", "echo", "garden", "machine", "dream"]
+verbs      = ["sings", "remembers", "forgets", "dances", "calculates"]
+
+for line in range(4):
+    a = random.choice(adjectives)
+    n = random.choice(nouns)
+    v = random.choice(verbs)
+    print(f"The {a} {n} {v}.")
+
+print()
+print("— made by a Python program")</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     HOMEWORK
+     ============================================================ -->
+<section class="homework" id="homework">
+  <div class="wrap">
+    <div class="chapter-head reveal">
+      <div class="chapter-num">★<small>Homework</small></div>
+      <div class="chapter-title-wrap">
+        <div class="eyebrow">Tonight's Assignment</div>
+        <h2 style="margin-top: 14px;">Build <em class="serif-italic">"Number Quest"</em></h2>
+        <p class="lede">A small but complete game. The computer thinks of a number; you have to guess it. Every wrong guess gives you a hint. You have <em>six</em> attempts.</p>
+      </div>
+    </div>
+
+    <div class="chapter-body reveal">
+      <div class="col-text">
+        <p>Below you'll find a <strong>working in-browser version</strong> you can play with right now. Below that, the <strong>take-home version</strong> &mdash; the one you'll write in real Python on your own computer, with <code>input()</code> for true interactivity. Both use everything from chapters 03 through 09.</p>
+      </div>
+
+      <h3 style="margin-top: 2em; color: var(--cream);">Part A &mdash; Play it now (browser version)</h3>
+      <p>Change <code>my_guess</code> below, hit Run, and try to land the secret number. The seed keeps things fair across runs &mdash; remove <code>random.seed</code> to make the game truly random.</p>
+
+      <div class="live-code" data-code='import random
+
+# Set a seed so the secret is consistent while you experiment.
+# Comment out the next line for a fresh number each Run.
+random.seed(7)
+
+secret = random.randint(1, 100)
+
+# ─── CHANGE THIS NUMBER AND RUN AGAIN ─────────
+my_guess = 50
+# ──────────────────────────────────────────────
+
+print("╔════════════════════════════════════╗")
+print("║       🎯  NUMBER QUEST  🎯         ║")
+print("╚════════════════════════════════════╝")
+print(f"Your guess: {my_guess}")
+print()
+
+if my_guess == secret:
+    print("🏆  INCREDIBLE! You guessed it!")
+    print(f"    The secret was indeed {secret}.")
+elif abs(my_guess - secret) <= 5:
+    print("🔥  SO CLOSE — you are within 5!")
+    if my_guess < secret: print("    Try a touch higher.")
+    else: print("    Try a touch lower.")
+elif my_guess < secret:
+    print("📉  Too low. Aim higher next time.")
+else:
+    print("📈  Too high. Aim lower next time.")'>
+        <div class="code-bar">
+          <div class="left"><span class="dots"><span></span><span></span><span></span></span><span>number_quest_browser.py</span></div>
+          <div class="right">Single-shot mode</div>
+        </div>
+        <div class="editor-area"><textarea class="cm-editor">import random
+
+# Set a seed so the secret is consistent while you experiment.
+# Comment out the next line for a fresh number each Run.
+random.seed(7)
+
+secret = random.randint(1, 100)
+
+# ─── CHANGE THIS NUMBER AND RUN AGAIN ─────────
+my_guess = 50
+# ──────────────────────────────────────────────
+
+print("╔════════════════════════════════════╗")
+print("║       🎯  NUMBER QUEST  🎯         ║")
+print("╚════════════════════════════════════╝")
+print(f"Your guess: {my_guess}")
+print()
+
+if my_guess == secret:
+    print("🏆  INCREDIBLE! You guessed it!")
+    print(f"    The secret was indeed {secret}.")
+elif abs(my_guess - secret) <= 5:
+    print("🔥  SO CLOSE — you are within 5!")
+    if my_guess < secret: print("    Try a touch higher.")
+    else: print("    Try a touch lower.")
+elif my_guess < secret:
+    print("📉  Too low. Aim higher next time.")
+else:
+    print("📈  Too high. Aim lower next time.")</textarea></div>
+        <div class="live-code-toolbar">
+          <button class="btn-run"><span class="play"></span> Run</button>
+          <button class="btn-reset">Reset</button>
+        </div>
+        <div class="output-pane"></div>
+      </div>
+
+      <h3 style="margin-top: 2.4em; color: var(--cream);">Part B &mdash; Your take-home challenge</h3>
+      <p>Open a Python file on your computer (or use <a href="https://replit.com" target="_blank" rel="noopener" style="color: var(--ochre);">replit.com</a> if you don't have Python installed yet), and turn the one-shot game above into a <em class="serif-italic">real interactive loop</em>. Here's the spec &mdash; you write the code.</p>
+
+      <div class="homework-grid">
+        <div>
+          <div class="box">
+            <h4>The Brief</h4>
+            <ol class="steps-list">
+              <li>Pick a random secret number between 1 and 100.</li>
+              <li>Give the player <strong>6 attempts</strong> to guess it.</li>
+              <li>On each guess, tell them <em>higher</em> or <em>lower</em>.</li>
+              <li>If they guess right, celebrate. If they run out, reveal the answer.</li>
+              <li>Show how many attempts they used.</li>
+            </ol>
+          </div>
+        </div>
+
+        <div>
+          <div class="box">
+            <h4>Stretch goals</h4>
+            <ul>
+              <li>Add a difficulty selector (easy = 50, hard = 100).</li>
+              <li>Tell them "freezing / cold / warm / hot" based on distance.</li>
+              <li>Wrap the whole thing in a function called <code>play()</code>.</li>
+              <li>Ask "play again?" at the end and loop.</li>
+              <li>Keep a running scoreboard of best attempts.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <h3 style="margin-top: 2em; color: var(--cream);">Starter scaffold</h3>
+      <p>Copy this into a file called <code>number_quest.py</code> on your machine and fill in the blanks:</p>
+
+      <div class="code-block" style="border-color: var(--cream);">
+        <div class="code-bar"><div class="left"><span class="dots"><span></span><span></span><span></span></span><span>number_quest.py</span></div><div class="right">starter</div></div>
+<pre class="static-code"><span class="tok-key">import</span> random
+
+<span class="tok-key">def</span> <span class="tok-fn">play</span>():
+    secret = random.<span class="tok-fn">randint</span>(<span class="tok-num">1</span>, <span class="tok-num">100</span>)
+    max_attempts = <span class="tok-num">6</span>
+
+    <span class="tok-fn">print</span>(<span class="tok-str">"🎯  NUMBER QUEST  🎯"</span>)
+    <span class="tok-fn">print</span>(<span class="tok-str">f"I'm thinking of a number between 1 and 100."</span>)
+    <span class="tok-fn">print</span>(<span class="tok-str">f"You have {max_attempts} attempts. Good luck."</span>)
+    <span class="tok-fn">print</span>()
+
+    <span class="tok-key">for</span> attempt <span class="tok-key">in</span> <span class="tok-fn">range</span>(<span class="tok-num">1</span>, max_attempts + <span class="tok-num">1</span>):
+        guess = <span class="tok-fn">int</span>(<span class="tok-fn">input</span>(<span class="tok-str">f"Attempt {attempt}/{max_attempts} — your guess: "</span>))
+
+        <span class="tok-com"># TODO: compare guess to secret</span>
+        <span class="tok-com"># TODO: if equal, celebrate and break out of the loop</span>
+        <span class="tok-com"># TODO: if too low, say so</span>
+        <span class="tok-com"># TODO: if too high, say so</span>
+        <span class="tok-key">pass</span>
+    <span class="tok-key">else</span>:
+        <span class="tok-com"># Runs if the for loop finished without `break`</span>
+        <span class="tok-fn">print</span>(<span class="tok-str">f"😬  Out of attempts. The number was {secret}."</span>)
+
+<span class="tok-key">if</span> __name__ == <span class="tok-str">"__main__"</span>:
+    <span class="tok-fn">play</span>()</pre>
+      </div>
+
+      <div class="callout" style="border-color: var(--ochre); color: var(--cream); font-style: italic;">
+        Bring your finished file (or a screenshot of it running) to the next session. We'll showcase the most creative variations.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="foot">
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <div class="eyebrow">Coda</div>
+        <h3 style="margin-top: 14px;">You've taken the <em class="serif-italic">first step.</em></h3>
+        <p style="font-size: 1.05rem; color: var(--ink-soft); max-width: 480px; margin-top: 12px;">Every senior engineer you'll ever meet started exactly where you are right now &mdash; staring at <code>print("Hello, World!")</code> and wondering what comes next. The honest answer is: <em class="serif-italic">a lot</em>. Be patient with yourself, write a little code every day, and you'll be writing serious programs sooner than you'd guess.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Keep going</h4>
+        <p>The official Python tutorial at <a href="https://docs.python.org/3/tutorial/" target="_blank" rel="noopener">docs.python.org</a> is unusually well written. Real Python and Automate the Boring Stuff are also classics.</p>
+      </div>
+      <div class="foot-col">
+        <h4>Tonight</h4>
+        <p>Build the Number Quest game. Bring it to the next session. Be ready to demo it &mdash; bugs and all.</p>
+      </div>
+    </div>
+
+    <div class="foot-bar">
+      <span>The Python Almanac · Vol. 01</span>
+      <span>An Introductory Demo Session</span>
+      <span>Set in Fraunces, Newsreader &amp; JetBrains Mono</span>
+    </div>
+  </div>
+</footer>
+
+<!-- ============================================================
+     SCRIPTS
+     ============================================================ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+
+<script>
+/* ============================================================
+   Today's date for masthead
+   ============================================================ */
+(function () {
+  const d = new Date();
+  const months = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const dateStr = `${months[d.getMonth()]} ${d.getFullYear()}`;
+  const el = document.getElementById('todayDate');
+  if (el) el.textContent = dateStr;
+})();
+
+/* ============================================================
+   CodeMirror editors — wire up every .cm-editor textarea
+   ============================================================ */
+const editors = [];
+document.querySelectorAll('textarea.cm-editor').forEach((ta) => {
+  const cm = CodeMirror.fromTextArea(ta, {
+    mode: 'python',
+    lineNumbers: true,
+    indentUnit: 4,
+    tabSize: 4,
+    indentWithTabs: false,
+    lineWrapping: true,
+    viewportMargin: Infinity,
+    theme: 'default',
+    extraKeys: {
+      Tab: (cm) => cm.replaceSelection('    ', 'end'),
+    }
+  });
+  editors.push({ cm, originalCode: ta.value, container: ta.closest('.live-code') });
+});
+
+/* ============================================================
+   PYODIDE — single shared instance
+   ============================================================ */
+let pyodide = null;
+let pyodideReady = false;
+const statusEl = document.getElementById('status');
+const statusText = document.getElementById('statusText');
+const loadingOverlay = document.getElementById('loadingOverlay');
+const loadingMsg = document.getElementById('loadingMsg');
+
+async function bootPyodide () {
+  try {
+    loadingMsg.textContent = 'Downloading Python runtime…';
+    pyodide = await loadPyodide({
+      indexURL: 'https://cdn.jsdelivr.net/pyodide/v0.26.4/full/',
+      stdout: (s) => { currentStdout += s + '\n'; },
+      stderr: (s) => { currentStderr += s + '\n'; }
+    });
+    pyodideReady = true;
+    statusText.textContent = 'Compiler ready';
+    statusEl.classList.add('ready');
+    setTimeout(() => loadingOverlay.classList.add('hide'), 250);
+    setTimeout(() => loadingOverlay.remove(), 1200);
+  } catch (e) {
+    loadingMsg.textContent = 'Failed to load compiler. Refresh to try again.';
+    statusText.textContent = 'Compiler offline';
+    console.error(e);
+  }
+}
+
+let currentStdout = '';
+let currentStderr = '';
+
+async function runPython (code, outputEl, runBtn) {
+  if (!pyodideReady) {
+    outputEl.innerHTML = '<span class="output-label">Status</span><span class="output-error">The compiler is still warming up — give it a few seconds and try again.</span>';
+    return;
+  }
+  currentStdout = '';
+  currentStderr = '';
+
+  outputEl.innerHTML = '<span class="output-label">Running…</span>';
+  runBtn.disabled = true;
+
+  try {
+    // Reset stdout/stderr capture
+    pyodide.setStdout({ batched: (s) => { currentStdout += s + '\n'; } });
+    pyodide.setStderr({ batched: (s) => { currentStderr += s + '\n'; } });
+
+    await pyodide.runPythonAsync(code);
+
+    const out = currentStdout.trimEnd();
+    const err = currentStderr.trimEnd();
+
+    let html = '<span class="output-label">Output</span>';
+    if (out) html += `<div class="output-ok">${escapeHtml(out)}</div>`;
+    if (err) html += `<div class="output-error">${escapeHtml(err)}</div>`;
+    if (!out && !err) html += '<div style="color: var(--code-comment); font-style: italic;">(no output)</div>';
+    outputEl.innerHTML = html;
+  } catch (e) {
+    const errStr = (e && e.message) ? e.message : String(e);
+    outputEl.innerHTML = `<span class="output-label">Error</span><div class="output-error">${escapeHtml(errStr)}</div>`;
+  } finally {
+    runBtn.disabled = false;
+  }
+}
+
+function escapeHtml (str) {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+
+/* ============================================================
+   Wire each live-code block's Run & Reset buttons
+   ============================================================ */
+editors.forEach(({ cm, originalCode, container }) => {
+  const runBtn = container.querySelector('.btn-run');
+  const resetBtn = container.querySelector('.btn-reset');
+  const outputEl = container.querySelector('.output-pane');
+
+  runBtn.addEventListener('click', () => {
+    const code = cm.getValue();
+    runPython(code, outputEl, runBtn);
+  });
+
+  resetBtn.addEventListener('click', () => {
+    cm.setValue(container.getAttribute('data-code') || originalCode);
+    outputEl.innerHTML = '';
+  });
+
+  // Cmd/Ctrl + Enter to run
+  cm.addKeyMap({
+    'Cmd-Enter': () => runBtn.click(),
+    'Ctrl-Enter': () => runBtn.click(),
+  });
+});
+
+/* ============================================================
+   Reveal-on-scroll
+   ============================================================ */
+const io = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+      io.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+/* ============================================================
+   Kick it off
+   ============================================================ */
+bootPyodide();
+</script>
+
+</body>
+</html>
